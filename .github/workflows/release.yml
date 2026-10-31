@@ -1,0 +1,49 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: build
+        run: ./gradlew build
+      - name: collect jars
+        run: |
+          mkdir -p dist
+          find build/libs -name '*.jar' ! -name '*-sources.jar' -exec cp {} dist/ \;
+          ls -l dist
+      - name: determine prerelease
+        id: pre
+        run: |
+          if [[ "$GITHUB_REF_NAME" =~ (alpha|beta|rc|pre|snapshot) ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flag=""
+          [ "${{ steps.pre.outputs.prerelease }}" = "true" ] && flag="--prerelease"
+          gh release create "$GITHUB_REF_NAME" dist/*.jar \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            $flag

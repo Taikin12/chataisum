@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "chataisum",
+	"version": "${version}",
+	"name": "chatAIsum",
+	"description": "Summarizes the last m minutes of Minecraft chat with OpenAI, OpenRouter, or an opencode server.",
+	"authors": [
+		"Taikin"
+	],
+	"contact": {},
+	"license": "CC0-1.0",
+	"icon": "assets/chataisum/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"com.taikin.chataisum.ChatAISumMod"
+		],
+		"client": [
+			"com.taikin.chataisum.client.ChatAISumClient"
+		],
+		"modmenu": [
+			"com.taikin.chataisum.client.ModMenuIntegration"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*",
+		"cloth-config": ">=26.3.159"
+	},
+	"recommends": {
+		"modmenu": "*"
+	}
+}
